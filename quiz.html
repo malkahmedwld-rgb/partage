@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIMA PARTAGE - قسم الاختبارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- استدعاء بيانات الاختبارات -->
+    <script src="quizzes_data.js"></script>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --text-body: #0f172a;
+            --bg-header: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --text-question: #334155;
+            --bg-quiz: #ffffff;
+            --border-quiz: #cbd5e1;
+            --bg-option: #f1f5f9;
+            --border-option: #e2e8f0;
+            --text-option: #334155;
+            --bg-option-hover: #e2e8f0;
+            --option-correct: #dcfce7;
+            --option-correct-border: #86efac;
+            --option-incorrect: #fee2e2;
+            --option-incorrect-border: #fca5a5;
+            --bg-btn: #2563eb;
+            --text-btn: #ffffff;
+            --bg-btn-hover: #1d4ed8;
+            --bg-footer: #0f172a;
+            --text-footer: #94a3b8;
+        }
+
+        body.dark-mode {
+            --bg-body: #0f172a;
+            --text-body: #f8fafc;
+            --bg-header: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --text-question: #cbd5e1;
+            --bg-quiz: #1e293b;
+            --border-quiz: #334155;
+            --bg-option: #0f172a;
+            --border-option: #334155;
+            --text-option: #cbd5e1;
+            --bg-option-hover: #334155;
+            --option-correct: #064e3b;
+            --option-correct-border: #059669;
+            --option-incorrect: #7f1d1d;
+            --option-incorrect-border: #dc2626;
+            --bg-btn: #3b82f6;
+            --bg-btn-hover: #2563eb;
+            --bg-footer: #020617;
+            --text-footer: #64748b;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--bg-header);
+            color: white;
+            position: relative;
+            width: 100%;
+            text-align: center;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 { margin: 0; font-size: 2rem; font-weight: 700; }
+
+        .back-btn {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .back-btn:hover { text-decoration: underline; }
+
+        .theme-toggle {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .quiz-card {
+            background: var(--bg-quiz);
+            border: 1px solid var(--border-quiz);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-footer);
+        }
+
+        .quiz-question {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-question);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-btn {
+            background: var(--bg-option);
+            border: 2px solid var(--border-option);
+            color: var(--text-option);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: right;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: var(--bg-option-hover);
+        }
+
+        .option-btn.correct {
+            background: var(--option-correct) !important;
+            border-color: var(--option-correct-border) !important;
+        }
+
+        .option-btn.incorrect {
+            background: var(--option-incorrect) !important;
+            border-color: var(--option-incorrect-border) !important;
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-option);
+            border-right: 4px solid var(--bg-btn);
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .explanation.show { display: block; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            background: var(--bg-btn);
+            color: var(--text-btn);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) { background: var(--bg-btn-hover); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .page-info {
+            font-weight: 600;
+            color: var(--text-body);
+        }
+
+        footer {
+            background: var(--bg-footer);
+            color: var(--text-footer);
+            text-align: center;
+            padding: 1rem 0;
+            width: 100%;
+            margin-top: auto;
+            font-size: 0.875rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--text-question);
+            padding: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            الرئيسية
+        </a>
+        <h1>قسم الاختبارات</h1>
+        <button id="themeToggle" class="theme-toggle" title="تبديل الوضع الليلي">
+            <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg id="sunIcon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+    </header>
+
+    <div class="container" id="quizContainer">
+        <!-- سيتم توليد محتوى الاختبارات هنا بواسطة الجافاسكريبت -->
+    </div>
+
+    <div class="pagination">
+        <button id="prevBtn" class="page-btn" disabled>السابق</button>
+        <span id="pageInfo" class="page-info">صفحة 1 المجموع 1</span>
+        <button id="nextBtn" class="page-btn">التالي</button>
+    </div>
+
+    <footer style="margin-top: 3rem;">
+        <p>حقوق النشر محفوظة 2026 &copy; المطور فريق SMG SECRETS</p>
+    </footer>
+
+    <script>
+        const itemsPerPage = 10;
+        let currentPage = 1;
+        const totalItems = typeof swimaQuizzes !== 'undefined' ? swimaQuizzes.length : 0;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        const container = document.getElementById('quizContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageInfo = document.getElementById('pageInfo');
+
+        function renderQuizzes() {
+            container.innerHTML = '';
+            
+            if (totalItems === 0) {
+                container.innerHTML = '<div class="empty-state"><h2>عذراً، لا توجد اختبارات متاحة حالياً.</h2></div>';
+                document.querySelector('.pagination').style.display = 'none';
+                return;
+            }
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, totalItems);
+            const currentQuizzes = swimaQuizzes.slice(startIdx, endIdx);
+
+            currentQuizzes.forEach((quiz, index) => {
+                const quizEl = document.createElement('div');
+                quizEl.className = 'quiz-card';
+                
+                // Header (Date & ID)
+                const header = document.createElement('div');
+                header.className = 'quiz-header';
+                header.innerHTML = `<span>الرقم: ${quiz.id}</span><span>${quiz.date}</span>`;
+                quizEl.appendChild(header);
+
+                // Question
+                const question = document.createElement('div');
+                question.className = 'quiz-question';
+                question.textContent = quiz.question;
+                quizEl.appendChild(question);
+
+                // Options
+                const optionsList = document.createElement('div');
+                optionsList.className = 'options-list';
+                
+                // Explanation pre-setup
+                const explanation = document.createElement('div');
+                explanation.className = 'explanation';
+                if (quiz.explanation && quiz.explanation.trim() !== '') {
+                    explanation.textContent = '💡 توضيح: ' + quiz.explanation;
+                } else {
+                    explanation.textContent = '💡 الإجابة الصحيحة تم تحديدها بالأخضر.';
+                }
+
+                quiz.options.forEach((opt, optIdx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = opt.text;
+                    
+                    btn.onclick = () => {
+                        const allBtns = optionsList.querySelectorAll('.option-btn');
+                        // Disable all buttons after choice
+                        allBtns.forEach(b => b.disabled = true);
+                        
+                        // Mark choices
+                        if (opt.is_correct) {
+                            btn.classList.add('correct');
+                        } else {
+                            btn.classList.add('incorrect');
+                            // Find and highlight correct answer
+                            const correctIdx = quiz.options.findIndex(o => o.is_correct);
+                            if (correctIdx !== -1) {
+                                allBtns[correctIdx].classList.add('correct');
+                            }
+                        }
+                        
+                        explanation.classList.add('show');
+                    };
+                    optionsList.appendChild(btn);
+                });
+
+                quizEl.appendChild(optionsList);
+                quizEl.appendChild(explanation);
+                container.appendChild(quizEl);
+            });
+
+            // Update Pagination
+            pageInfo.textContent = `صفحة ${currentPage} من ${totalPages}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderQuizzes();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderQuizzes();
+            }
+        });
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('themeToggle');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('swima_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            if (isDark) {
+                localStorage.setItem('swima_theme', 'dark');
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            } else {
+                localStorage.setItem('swima_theme', 'light');
+                moonIcon.style.display = 'block';
+                sunIcon.style.display = 'none';
+            }
+        });
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderQuizzes();
+        });
+    </script>
+</body>
+</html>
