@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWIMA PARTAGE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* متغيرات الألوان للوضع الفاتح والليلي */
+        :root {
+            --bg-body: #f8fafc;
+            --text-body: #0f172a;
+            --bg-header: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --text-question: #334155;
+            --bg-search: white;
+            --border-search: #e2e8f0;
+            --border-search-focus: #cbd5e1;
+            --text-search: #334155;
+            --text-placeholder: #94a3b8;
+            --bg-btn: #ffffff;
+            --border-btn: #e2e8f0;
+            --text-btn: #475569;
+            --bg-btn-hover: #f8fafc;
+            --text-btn-hover: #0f172a;
+            --border-btn-hover: #cbd5e1;
+            --bg-footer: #0f172a;
+            --text-footer: #94a3b8;
+        }
+
+        body.dark-mode {
+            --bg-body: #0f172a;
+            --text-body: #f8fafc;
+            --bg-header: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --text-question: #cbd5e1;
+            --bg-search: #1e293b;
+            --border-search: #334155;
+            --border-search-focus: #475569;
+            --text-search: #f8fafc;
+            --text-placeholder: #64748b;
+            --bg-btn: #1e293b;
+            --border-btn: #334155;
+            --text-btn: #cbd5e1;
+            --bg-btn-hover: #334155;
+            --text-btn-hover: #f8fafc;
+            --border-btn-hover: #475569;
+            --bg-footer: #020617;
+            --text-footer: #64748b;
+        }
+
+        /* التنسيقات العامة */
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* تنسيق الشريط العلوي */
+        header {
+            background: var(--bg-header);
+            color: white;
+            position: relative;
+            width: 100%;
+            text-align: center;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* تنسيق صورة البانر */
+        .banner-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 1.5rem auto 0 auto;
+            padding: 0 1rem;
+            box-sizing: border-box;
+        }
+
+        .responsive-banner {
+            width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* تنسيق السؤال/العنوان الفرعي */
+        .question-container {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.5rem 0;
+            color: var(--text-question);
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        /* تنسيق شريط البحث */
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-search);
+            border: 1px solid var(--border-search);
+            border-radius: 2rem;
+            padding: 0.75rem 1.25rem;
+            margin: 0 1rem 1.5rem 1rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            border-color: var(--border-search-focus);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .search-icon {
+            color: #94a3b8;
+            margin-left: 0.75rem;
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-search);
+            background: transparent;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-placeholder);
+        }
+        
+        /* تنسيق زر مسح البحث */
+        .clear-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: none; /* مخفي افتراضياً */
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            color: #ef4444; /* لون أحمر عند التمرير */
+        }
+
+        .clear-btn.visible {
+            display: flex;
+        }
+
+        /* تنسيق زر الوضع الليلي */
+        .theme-toggle {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* تنسيق شبكة الأزرار */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* تنسيق الأزرار الخاصة بالولايات ومجموعات فيسبوك */
+        .wilaya-btn, .group-btn {
+            background-color: var(--bg-btn);
+            border: 1px solid var(--border-btn);
+            color: var(--text-btn);
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: popIn 0.3s ease-out forwards;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        /* إضافة أيقونة فيسبوك لأزرار المجموعات */
+        .group-btn::before {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 0.5rem; /* مسافة بين الأيقونة والنص */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231877F2'%3E%3Cpath d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            flex-shrink: 0; /* لمنع تقلص الأيقونة */
+        }
+
+        .wilaya-btn:hover, .group-btn:hover {
+            background-color: var(--bg-btn-hover);
+            color: var(--text-btn-hover);
+            border-color: var(--border-btn-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .hidden-btn {
+            display: none !important;
+        }
+
+        /* زر العودة للأعلى */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #2563eb; /* لون أزرق أنيق */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 3.5rem;
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 50; /* لضمان ظهوره فوق العناصر الأخرى */
+        }
+
+        .scroll-to-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .scroll-to-top:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-3px);
+        }
+
+        /* تنسيق الفوتر (حقوق النشر) */
+        footer {
+            background-color: var(--bg-footer);
+            color: var(--text-footer);
+            text-align: center;
+            padding: 1rem 0;
+            width: 100%;
+            margin-top: auto;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SWIMA PARTAGE</h1>
+        <!-- زر الوضع الليلي -->
+        <button id="themeToggle" class="theme-toggle" title="تبديل الوضع الليلي">
+            <!-- أيقونة القمر -->
+            <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <!-- أيقونة الشمس -->
+            <svg id="sunIcon" style="display: none;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+        </button>
+    </header>
+
+    <!-- صورة البانر الترحيبية -->
+    <div class="banner-container">
+        <img src="paner.jpg" alt="بانر سويما بارطاج" class="responsive-banner">
+    </div>
+
+    <div class="question-container">
+        ماهي الولاية المتواجدة معنا بقوة في الصفحة؟
+    </div>
+
+    <!-- شريط البحث -->
+    <div class="search-container">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن ولاية هنا...">
+        <!-- زر مسح البحث -->
+        <button id="clearSearchBtn" class="clear-btn" title="مسح البحث">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+
+    <div class="grid-container">
+        <button class="wilaya-btn">ولاية أدرار</button>
+        <button class="wilaya-btn">ولاية الشلف</button>
+        <button class="wilaya-btn">ولاية الأغواط</button>
+        <button class="wilaya-btn">ولاية أم البواقي</button>
+        <button class="wilaya-btn">ولاية باتنة</button>
+        <button class="wilaya-btn">ولاية بجاية</button>
+        <button class="wilaya-btn">ولاية بسكرة</button>
+        <button class="wilaya-btn">ولاية بشار</button>
+        <button class="wilaya-btn">ولاية البليدة</button>
+        <button class="wilaya-btn">ولاية البويرة</button>
+        <button class="wilaya-btn">ولاية تمنراست</button>
+        <button class="wilaya-btn">ولاية تبسة</button>
+        <button class="wilaya-btn">ولاية تلمسان</button>
+        <button class="wilaya-btn">ولاية تيارت</button>
+        <button class="wilaya-btn">ولاية تيزي وزو</button>
+        <button class="wilaya-btn" id="algiersBtn">ولاية الجزائر</button>
+        <button class="wilaya-btn">ولاية الجلفة</button>
+        <button class="wilaya-btn">ولاية جيجل</button>
+        <button class="wilaya-btn">ولاية سطيف</button>
+        <button class="wilaya-btn">ولاية سعيدة</button>
+        <button class="wilaya-btn">ولاية سكيكدة</button>
+        <button class="wilaya-btn">ولاية سيدي بلعباس</button>
+        <button class="wilaya-btn">ولاية عنابة</button>
+        <button class="wilaya-btn">ولاية قالمة</button>
+        <button class="wilaya-btn">ولاية قسنطينة</button>
+        <button class="wilaya-btn">ولاية المدية</button>
+        <button class="wilaya-btn">ولاية مستغانم</button>
+        <button class="wilaya-btn">ولاية المسيلة</button>
+        <button class="wilaya-btn">ولاية معسكر</button>
+        <button class="wilaya-btn">ولاية ورقلة</button>
+        <button class="wilaya-btn">ولاية وهران</button>
+        <button class="wilaya-btn">ولاية البيض</button>
+        <button class="wilaya-btn">ولاية إليزي</button>
+        <button class="wilaya-btn">ولاية برج بوعريريج</button>
+        <button class="wilaya-btn">ولاية بومرداس</button>
+        <button class="wilaya-btn">ولاية الطارف</button>
+        <button class="wilaya-btn">ولاية تندوف</button>
+        <button class="wilaya-btn">ولاية تسيمسيلت</button>
+        <button class="wilaya-btn">ولاية الوادي</button>
+        <button class="wilaya-btn">ولاية خنشلة</button>
+        <button class="wilaya-btn">ولاية سوق أهراس</button>
+        <button class="wilaya-btn">ولاية تيبازة</button>
+        <button class="wilaya-btn">ولاية ميلة</button>
+        <button class="wilaya-btn">ولاية عين الدفلى</button>
+        <button class="wilaya-btn">ولاية النعامة</button>
+        <button class="wilaya-btn">ولاية عين تموشنت</button>
+        <button class="wilaya-btn">ولاية غرداية</button>
+        <button class="wilaya-btn">ولاية غليزان</button>
+        <button class="wilaya-btn">ولاية تيميمون</button>
+        <button class="wilaya-btn">ولاية برج باجي مختار</button>
+        <button class="wilaya-btn">ولاية أولاد جلال</button>
+        <button class="wilaya-btn">ولاية بني عباس</button>
+        <button class="wilaya-btn">ولاية عين صالح</button>
+        <button class="wilaya-btn">ولاية عين قزام</button>
+        <button class="wilaya-btn">ولاية توقرت</button>
+        <button class="wilaya-btn">ولاية جانت</button>
+        <button class="wilaya-btn">ولاية المغير</button>
+        <button class="wilaya-btn">ولاية المنيعة</button>
+    </div>
+
+    <!-- قسم مجموعات فيسبوك -->
+    <div class="question-container">
+        مجموعات فيسبوك الخاصة بالنشر (فريق سويما)
+    </div>
+
+    <!-- منطقة كتابة وحفظ المنشور -->
+    <div style="width: 90%; max-width: 600px; margin: 0 auto 1.5rem auto; display: flex; flex-direction: column;">
+        <textarea id="postContent" rows="4" placeholder="📝 اكتب نص المنشور هنا وسيحفظ تلقائياً..." style="width: 100%; padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-search); background-color: var(--bg-body); color: var(--text-body); font-family: inherit; resize: vertical;"></textarea>
+    </div>
+
+    <div class="grid-container">
+        <a href="https://facebook.com/groups/411285930229942/" target="_blank" class="group-btn">جامعة 01</a>
+        <a href="https://facebook.com/groups/facalg2/" target="_blank" class="group-btn">جامعة 02</a>
+        <a href="https://facebook.com/groups/1858683534190127/" target="_blank" class="group-btn">جامعة 03</a>
+        <a href="https://facebook.com/groups/1164026463728400/" target="_blank" class="group-btn">جامعة 04</a>
+        <a href="https://facebook.com/groups/560810814550113/" target="_blank" class="group-btn">جامعة 05</a>
+        <a href="https://facebook.com/groups/1343879940416499/" target="_blank" class="group-btn">جامعة 06</a>
+        <a href="https://facebook.com/groups/295250703255353/" target="_blank" class="group-btn">جامعة 07</a>
+        <a href="https://facebook.com/groups/368808250819069/" target="_blank" class="group-btn">جامعة 08</a>
+        <a href="https://facebook.com/groups/1490393964907534/" target="_blank" class="group-btn">جامعة 09</a>
+        <a href="https://facebook.com/groups/716565011822559/" target="_blank" class="group-btn">مجموعة 10 بيع وشراء</a>
+        <a href="https://facebook.com/groups/659706268783765/" target="_blank" class="group-btn">جامعة 11</a>
+        <a href="https://facebook.com/groups/modon25ali/" target="_blank" class="group-btn">جامعة 12</a>
+        <a href="https://facebook.com/groups/240083859899450/" target="_blank" class="group-btn">شباب وبنات</a>
+        <a href="https://facebook.com/groups/2253801241439052/" target="_blank" class="group-btn">مجموعة 13</a>
+        <a href="https://facebook.com/groups/474599476433321/" target="_blank" class="group-btn">مجموعة 14</a>
+        <a href="https://facebook.com/groups/951053525847042/" target="_blank" class="group-btn">مجموعة 15</a>
+        <a href="https://facebook.com/groups/1613048638999590/" target="_blank" class="group-btn">مجموعة 16</a>
+        <a href="https://facebook.com/groups/1542862612698368/" target="_blank" class="group-btn">مجموعة 17</a>
+        <a href="https://facebook.com/groups/163719247330709/" target="_blank" class="group-btn">مجموعة 18</a>
+        <a href="https://facebook.com/groups/622524614977640/" target="_blank" class="group-btn">مجموعة 19</a>
+        <a href="https://facebook.com/groups/358311131279386/" target="_blank" class="group-btn">مجموعة 20</a>
+        <a href="https://facebook.com/groups/1708442446068599/" target="_blank" class="group-btn">مجموعة 21</a>
+        <a href="https://facebook.com/groups/780943686599717/" target="_blank" class="group-btn">مجموعة 22</a>
+        <a href="https://facebook.com/groups/1447023055571014/" target="_blank" class="group-btn">مجموعة 23</a>
+        <a href="https://facebook.com/groups/1879699092236618/" target="_blank" class="group-btn">مجموعة 24</a>
+        <a href="https://facebook.com/groups/2344302252330366/" target="_blank" class="group-btn">مجموعة 25</a>
+        <a href="https://facebook.com/groups/194764161558778/" target="_blank" class="group-btn">مجموعة 26</a>
+        <a href="https://facebook.com/groups/4407303626021955/" target="_blank" class="group-btn">مجموعة 27</a>
+        <a href="https://facebook.com/groups/2649872108404774/" target="_blank" class="group-btn">مجموعة 28</a>
+        <a href="https://facebook.com/groups/2690706107877401/" target="_blank" class="group-btn">مجموعة 29</a>
+    </div>
+
+    <!-- زر العودة للأعلى -->
+    <button id="scrollToTopBtn" class="scroll-to-top" title="العودة للأعلى">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 15l-6-6-6 6"></path>
+        </svg>
+    </button>
+
+    <footer>
+        <p>حقوق النشر محفوظة 2026 &copy; المطور فريق SMG SECRETS</p>
+    </footer>
+
+    <!-- سكريبت البحث -->
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const wilayaBtns = document.querySelectorAll('.wilaya-btn');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+
+        // دالة التحكم في ظهور وإخفاء زر المسح
+        function toggleClearButton() {
+            if (searchInput.value.length > 0) {
+                clearSearchBtn.classList.add('visible');
+            } else {
+                clearSearchBtn.classList.remove('visible');
+            }
+        }
+
+        // دالة تصفية الولايات
+        function filterWilayas(query) {
+            const normalizedQuery = query.toLowerCase().trim();
+            wilayaBtns.forEach(btn => {
+                const text = btn.textContent.toLowerCase();
+                if (text.includes(normalizedQuery)) {
+                    btn.classList.remove('hidden-btn');
+                } else {
+                    btn.classList.add('hidden-btn');
+                }
+            });
+        }
+
+        // استرجاع البحث المحفوظ عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedQuery = localStorage.getItem('swima_search_query');
+            if (savedQuery) {
+                searchInput.value = savedQuery;
+                filterWilayas(savedQuery);
+                toggleClearButton();
+            }
+            
+            // استرجاع حالة الوضع الليلي
+            const savedTheme = localStorage.getItem('swima_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            }
+
+            // استرجاع نص المنشور المحفوظ
+            const postContent = document.getElementById('postContent');
+            if (postContent && localStorage.getItem('swima_post_content')) {
+                postContent.value = localStorage.getItem('swima_post_content');
+            }
+        });
+
+        // الاستماع لحدث الكتابة وحفظ القيمة وتطبيق التصفية
+        searchInput.addEventListener('input', function() {
+            const query = this.value;
+            localStorage.setItem('swima_search_query', query);
+            filterWilayas(query);
+            toggleClearButton();
+        });
+
+        // حدث الضغط على زر المسح
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            localStorage.setItem('swima_search_query', '');
+            filterWilayas('');
+            toggleClearButton();
+            searchInput.focus(); // إعادة مؤشر الكتابة إلى شريط البحث
+        });
+
+        // حدث الضغط على زر التبديل بين الوضعين
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            
+            if (isDark) {
+                localStorage.setItem('swima_theme', 'dark');
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            } else {
+                localStorage.setItem('swima_theme', 'light');
+                moonIcon.style.display = 'block';
+                sunIcon.style.display = 'none';
+            }
+        });
+
+        // حفظ نص المنشور عند الكتابة في الـ localStorage
+        const postContentInput = document.getElementById('postContent');
+        if (postContentInput) {
+            postContentInput.addEventListener('input', function() {
+                localStorage.setItem('swima_post_content', this.value);
+            });
+        }
+
+        // إظهار وإخفاء زر العودة للأعلى بناءً على التمرير
+        const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+
+        // العودة للأعلى بسلاسة عند الضغط على الزر
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
